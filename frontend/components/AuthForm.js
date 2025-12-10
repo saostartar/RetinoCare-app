@@ -1,9 +1,10 @@
 // components/AuthForm.js
 "use client"
 
+import axios from 'axios';
 import { useState } from 'react';
-import { setTokens } from '../lib/auth';
-import { apiClient } from '../lib/api';
+import { setTokens } from '@/lib/auth';
+import { API_BASE_URL, ENDPOINTS } from "../lib/apiConfig";
 import { useRouter } from 'next/navigation';
 
 export default function AuthForm({ isLogin = true }) {
@@ -20,33 +21,32 @@ export default function AuthForm({ isLogin = true }) {
     setError('');
     
     try {
-      const endpoint = isLogin ? '/auth/login' : '/auth/register';
-      const payload = isLogin ? { email, password } : { username, email, password };
-      
-      console.log(`Attempting ${isLogin ? 'login' : 'registration'} to ${endpoint}`, { email });
-      
-      const response = await apiClient.post(endpoint, payload);
-      console.log('API response:', response.data);
-      
-      if (!isLogin) {
-        alert('Registrasi berhasil! Silahkan masuk.');
-        router.push('/login');
+    const payload = isLogin
+        ? { email, password }
+        : { username, email, password };
+
+      // Gunakan base + endpoint yang sudah benar (dengan prefix /api)
+      const response = await axios.post(
+        `${API_BASE_URL}${isLogin ? ENDPOINTS.LOGIN : ENDPOINTS.REGISTER}`,
+        payload,
+        {
+          headers: { "Content-Type": "application/json" },
+          withCredentials: false, // kita pakai Bearer token, bukan cookie
+        }
+      );
+
+      const { access_token, refresh_token, user } = response.data;
+      if (!access_token || !refresh_token) {
+        setError("Autentikasi gagal: Respons server tidak valid");
         return;
       }
 
-      // Handle successful login
-      const { access_token, refresh_token, user } = response.data;
-      
-      if (!access_token || !refresh_token) {
-        console.error('Missing tokens in response:', response.data);
-        setError('Autentikasi gagal: Respons server tidak valid');
-        return;
-      }
-      
       setTokens({ access_token, refresh_token, user });
       
-      console.log('Login successful, redirecting to dashboard');
-      router.push('/detect');
+       // Redirect berbasis role
+      const role = (user?.role || '').toLowerCase();
+      const dest = role === 'admin' || role === 'doctor' ? '/dashboard' : '/exam';
+      router.push(dest);
     } catch (err) {
       console.error('Login error:', err);
       

@@ -4,16 +4,20 @@
  */
 
 // Base API URL with fallback to localhost for development
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 // API endpoints
 export const ENDPOINTS = {
-  UPLOAD: '/upload',
-  LOGIN: '/auth/login',
-  REGISTER: '/auth/register',
-  REFRESH: '/auth/refresh',
-  DETECTION_HISTORY: '/detection/history',
-  PROFILE: '/user/profile',
+  LOGIN: "/api/auth/login",
+  REGISTER: "/api/auth/register",
+  LOGOUT: "/api/auth/logout",
+  REFRESH: "/api/auth/refresh",
+
+  // clinical
+  PATIENTS: "/api/patients",
+  EXAMS: "/api/exams",
+  ADMIN_STATS: "/api/admin/stats",
+  ADMIN_USERS: "/api/admin/users",
 };
 
 /**

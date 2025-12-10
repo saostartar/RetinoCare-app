@@ -307,6 +307,59 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: 0 0 8px rgba(59, 130, 246, 0.8);
 }
 
+/* Enhanced Scanning Animation */
+@keyframes scan-down {
+  0% { 
+    top: 0%; 
+    opacity: 0; 
+  }
+  50% { 
+    opacity: 1; 
+  }
+  100% { 
+    top: 100%; 
+    opacity: 0; 
+  }
+}
+
+.animate-scan-down {
+  animation: scan-down 4s ease-in-out infinite;
+  animation-delay: 2s;
+}
+
+/* Smooth Float Animations */
+@keyframes float {
+  0%, 100% { 
+    transform: translateY(0px) rotate(0deg); 
+  }
+  50% { 
+    transform: translateY(-15px) rotate(5deg); 
+  }
+}
+
+@keyframes float-delayed {
+  0%, 100% { 
+    transform: translateY(0px) rotate(0deg); 
+  }
+  50% { 
+    transform: translateY(-12px) rotate(-3deg); 
+  }
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+.animate-float-delayed {
+  animation: float-delayed 4s ease-in-out infinite;
+  animation-delay: 2s;
+}
+
+/* Pulse Animation */
+.animate-pulse-slow {
+  animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
 /* Scrollbar custom styling */
 ::-webkit-scrollbar {
   width: 10px;

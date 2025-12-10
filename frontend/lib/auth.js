@@ -3,61 +3,75 @@
 const isBrowser = typeof window !== 'undefined';
 
 /**
- * Store authentication tokens in localStorage
- * @param {string} accessToken - JWT access token
- * @param {string} refreshToken - JWT refresh token for token renewal
+ * Simpan token dan data user ke localStorage
+ * @param {{ access_token: string, refresh_token: string, user: object }} param0
  */
 export const setTokens = ({ access_token, refresh_token, user }) => {
   if (!isBrowser) return;
-  
-  localStorage.setItem("accessToken", access_token);
-  localStorage.setItem("refreshToken", refresh_token);
-  if (user) {
-    localStorage.setItem("user", JSON.stringify(user));
+
+  try {
+    localStorage.setItem('accessToken', access_token);
+    localStorage.setItem('refreshToken', refresh_token);
+    const payload = user ? JSON.stringify(user) : 'null';
+    // Simpan user (kompatibel: dua key)
+    localStorage.setItem('user', payload);
+    localStorage.setItem('rc_user', payload);
+  } catch (e) {
+    console.error('Failed storing tokens', e);
   }
 };
 
 /**
- * Get the access token from localStorage
- * @returns {string|null} The stored access token or null
+ * Ambil access token dari localStorage
+ * @returns {string|null}
  */
 export const getAccessToken = () => {
   if (!isBrowser) return null;
-  return localStorage.getItem("accessToken");
+  return localStorage.getItem('accessToken');
 };
 
 /**
- * Get the refresh token from localStorage
- * @returns {string|null} The stored refresh token or null
+ * Ambil refresh token dari localStorage
+ * @returns {string|null}
  */
 export const getRefreshToken = () => {
   if (!isBrowser) return null;
-  return localStorage.getItem("refreshToken");
+  return localStorage.getItem('refreshToken');
 };
 
 /**
- * Get the current user data from localStorage
- * @returns {Object|null} The user data or null
+ * Ambil data user saat ini dari localStorage
+ * @returns {Object|null}
  */
 export const getUser = () => {
   if (!isBrowser) return null;
-  const userData = localStorage.getItem("user");
-  return userData ? JSON.parse(userData) : null;
+  try {
+    const raw = localStorage.getItem('rc_user') || localStorage.getItem('user');
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
 };
 
 /**
- * Remove all authentication data from localStorage
+ * Hapus seluruh data autentikasi
  */
 export const clearAuth = () => {
   if (!isBrowser) return;
-  localStorage.removeItem("accessToken");
-  localStorage.removeItem("refreshToken");
-  localStorage.removeItem("user");
+  try {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('user');
+    localStorage.removeItem('rc_user');
+  } catch (e) {
+    console.error('Failed clearing auth', e);
+  }
 };
 
 /**
- * Check if the user is authenticated
- * @returns {boolean} True if authenticated, false otherwise
+ * Cek status autentikasi
+ * @returns {boolean}
  */
 export const isAuthenticated = () => {
   if (!isBrowser) return false;
@@ -65,18 +79,26 @@ export const isAuthenticated = () => {
 };
 
 /**
- * Store only the access token (used during token refresh)
- * @param {string} accessToken - New JWT access token
+ * Perbarui access token (saat refresh)
+ * @param {string} accessToken
  */
 export const updateAccessToken = (accessToken) => {
   if (!isBrowser) return;
-  localStorage.setItem("accessToken", accessToken);
+  try {
+    localStorage.setItem('accessToken', accessToken);
+  } catch (e) {
+    console.error('Failed updating access token', e);
+  }
 };
 
-// For backward compatibility
+// Backward compatibility helpers
 export const setToken = (token) => {
   if (!isBrowser) return;
-  localStorage.setItem("accessToken", token);
+  try {
+    localStorage.setItem('accessToken', token);
+  } catch (e) {
+    console.error('Failed setting token', e);
+  }
 };
 
 export const getToken = getAccessToken;
